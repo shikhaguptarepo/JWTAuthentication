@@ -44,7 +44,7 @@ namespace JWTAuthentication.Controllers
             {
                 new Claim(JwtRegisteredClaimNames.Sub, userInfo.Username),
                 new Claim(JwtRegisteredClaimNames.Email, userInfo.EmailAddress),
-                new Claim("DateOfJoing", userInfo.DateOfJoing.ToString("yyyy-MM-dd")),
+                new Claim("DateOfJoining", userInfo.DateOfJoining.ToString("yyyy-MM-dd")),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
@@ -65,7 +65,7 @@ namespace JWTAuthentication.Controllers
             //Demo Purpose, I have Passed HardCoded User Information
             if (login.Username == "Shikha" && login.Password=="123")
             {
-                user = new UserModel { Username = "Shikha Gupta", EmailAddress = "shikha.gupta2104@gmail.com", DateOfJoing = new DateTime(2025, 12, 05) };
+                user = new UserModel { Username = "Shikha Gupta", EmailAddress = "shikha.gupta2104@gmail.com", DateOfJoining = new DateTime(2025, 12, 05) };
             }
             return user;
         }
