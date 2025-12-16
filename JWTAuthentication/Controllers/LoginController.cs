@@ -1,11 +1,17 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using BCrypt.Net;
+using JWTAuthentication.Data;
+using JWTAuthentication.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.Scripting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
+
 
 namespace JWTAuthentication.Controllers
 {
@@ -14,10 +20,11 @@ namespace JWTAuthentication.Controllers
     public class LoginController : Controller
     {
         private IConfiguration _config;
-
-        public LoginController(IConfiguration config)
+        private readonly AppDbContext _db;
+        public LoginController(IConfiguration config,AppDbContext db)
         {
             _config = config;
+            _db =  db;
         }
         [AllowAnonymous]
         [HttpPost]
@@ -59,14 +66,26 @@ namespace JWTAuthentication.Controllers
 
         private UserModel AuthenticateUser(UserModel login)
         {
-            UserModel user = null;
+           // UserModel user = null;
 
             //Validate the User Credentials
             //Demo Purpose, I have Passed HardCoded User Information
-            if (login.Username == "Shikha" && login.Password=="123")
-            {
-                user = new UserModel { Username = "Shikha Gupta", EmailAddress = "shikha.gupta2104@gmail.com", DateOfJoining = new DateTime(2025, 12, 05) };
-            }
+            //if (login.Username == "Shikha" && login.PasswordHash=="123")
+            //{
+            //    user = new UserModel { Username = "Shikha Gupta", EmailAddress = "shikha.gupta2104@gmail.com", DateOfJoining = new DateTime(2025, 12, 05) };
+            //}
+
+            // Check username exists
+           var user = _db.Users.FirstOrDefault(u => u.Username == login.Username);
+
+            if (user == null)
+                return null;
+
+            // Compare password
+            if (!BCrypt.Net.BCrypt.Verify(login.PasswordHash, user.PasswordHash))
+                return null;
+
+       
             return user;
         }
     }
